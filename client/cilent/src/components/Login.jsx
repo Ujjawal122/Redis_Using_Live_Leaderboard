@@ -2,13 +2,11 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FaBolt, FaEnvelope, FaLock, FaTrophy } from "react-icons/fa";
 import { useState } from "react";
-import axios from "axios";
-
-
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,13 +28,11 @@ const Login = () => {
     setStatus("");
 
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, {
+      await login({
         email: formData.email.trim(),
         password: formData.password,
       });
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/leaderboard");
     } catch (error) {
       const message =
@@ -50,9 +46,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-
-
 
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-hidden">
@@ -162,7 +155,6 @@ const Login = () => {
               className="w-full px-6 py-3 bg-orange-500 rounded-lg font-semibold hover:bg-orange-600 transition"
               type="submit"
               disabled={loading}
-
             >
               {loading ? "Logging in..." : "Login"}
             </button>

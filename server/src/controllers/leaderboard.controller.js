@@ -10,14 +10,15 @@ import {
 import asyncHandler from "../utils/asyncHandler.js";
 
 export const updateScore = asyncHandler(async (req, res) => {
-  const { username, score } = req.body;
-  const normalizedUsername = username?.trim();
+  // Username is taken from the verified JWT — client cannot forge it
+  const normalizedUsername = req.user.username;
+  const { score } = req.body;
   const numericScore = Number(score);
 
-  if (!normalizedUsername || !Number.isFinite(numericScore)) {
+  if (!Number.isFinite(numericScore)) {
     return res.status(400).json({
       success: false,
-      message: "Username and numeric score are required",
+      message: "A numeric score is required",
     });
   }
 
@@ -50,6 +51,7 @@ export const updateScore = asyncHandler(async (req, res) => {
     rank: rank === null ? null : rank + 1,
   });
 });
+
 
 export const getTopPlayers = asyncHandler(async (req, res) => {
   const leaderboard = await getTopPlayerService();

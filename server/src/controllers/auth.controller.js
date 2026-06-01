@@ -9,6 +9,14 @@ const sanitizeUser = (user) => {
   return userObject;
 };
 
+// Cookie options reused across login/register/logout
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax", // "strict" blocks cookies on cross-origin dev (5173 → 3000)
+  maxAge: 4 * 24 * 60 * 60 * 1000, // 4 days in ms
+};
+
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -40,11 +48,16 @@ export const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
   });
 
-  res.status(201).json({
-    success: true,
-    token: generateToken(user._id),
-    user: sanitizeUser(user),
-  });
+  const token = generateToken(user._id);
+
+  // ✅ Token lives ONLY in the HttpOnly cookie — never returned in the body
+  res
+    .status(201)
+    .cookie("token", token, cookieOptions)
+    .json({
+      success: true,
+      user: sanitizeUser(user),
+    });
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
@@ -75,9 +88,40 @@ export const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
+  const token = generateToken(user._id);
+
+  // ✅ Token lives ONLY in the HttpOnly cookie — never returned in the body
+  res
+    .status(200)
+    .cookie("token", token, cookieOptions)
+    .json({
+      success: true,
+      user: sanitizeUser(user),
+    });
+});
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  res
+    .status(200)
+    .clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    })
+    .json({
+      success: true,
+      message: "Logged out successfully",
+    });
+});
+
+
+export const getMe = asyncHandler(async (req, res) => {
+  
   res.status(200).json({
     success: true,
-    token: generateToken(user._id),
-    user: sanitizeUser(user),
+    user: req.user,
   });
 });
+
+
+

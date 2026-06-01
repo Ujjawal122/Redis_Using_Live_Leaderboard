@@ -9,13 +9,11 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { useState } from "react";
-import axios from "axios";
-
-
-const API_URL = import.meta.env.VITE_BACKEND_URL 
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -38,14 +36,13 @@ const Signup = () => {
     setStatus("");
 
     try {
-      const res = await axios.post(`${API_URL}/api/auth/register`, {
+      await register({
         username: formData.username.trim(),
         email: formData.email.trim(),
         password: formData.password,
       });
 
-      setStatus(res.data.message || "Registration successful");
-      navigate("/login");
+      navigate("/leaderboard");
     } catch (error) {
       const message =
         error.response?.data?.message ||
