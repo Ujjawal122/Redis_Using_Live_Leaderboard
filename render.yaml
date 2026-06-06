@@ -15,16 +15,11 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           type: keyvalue
           name: live-leaderboard-redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          type: keyvalue
-          name: live-leaderboard-redis
-          property: port
+          property: connectionString
 
   - type: web
     name: live-leaderboard-client
