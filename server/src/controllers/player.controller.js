@@ -103,7 +103,7 @@ export const deleteMe = asyncHandler(async (req, res) => {
     .clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .json({
       success: true,

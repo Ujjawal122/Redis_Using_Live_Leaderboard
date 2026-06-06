@@ -13,7 +13,7 @@ const sanitizeUser = (user) => {
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax", // "strict" blocks cookies on cross-origin dev (5173 → 3000)
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   maxAge: 4 * 24 * 60 * 60 * 1000, // 4 days in ms
 };
 
@@ -106,7 +106,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .json({
       success: true,
@@ -122,6 +122,5 @@ export const getMe = asyncHandler(async (req, res) => {
     user: req.user,
   });
 });
-
 
 
