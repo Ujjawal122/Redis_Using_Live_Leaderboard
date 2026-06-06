@@ -21,19 +21,6 @@ services:
           name: live-leaderboard-redis
           property: connectionString
 
-  - type: web
-    name: live-leaderboard-client
-    runtime: static
-    buildCommand: cd client && npm ci && npm run build
-    staticPublishPath: client/dist
-    envVars:
-      - key: VITE_BACKEND_URL
-        value: https://live-leaderboard-api.onrender.com
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
   - type: keyvalue
     name: live-leaderboard-redis
     plan: free
